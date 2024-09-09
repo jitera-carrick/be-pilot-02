@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @tryn %>
+
+<div>
+  <%= link_to "Edit this tryn", edit_tryn_path(@tryn) %> |
+  <%= link_to "Back to tryns", tryns_path %>
+
+  <%= button_to "Destroy this tryn", @tryn, method: :delete %>
+</div>
