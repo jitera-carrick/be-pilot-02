@@ -12,4 +12,5 @@ Rails.application.routes.draw do
   get 'api-docs/v1/swagger.yaml' => 'swagger#yaml'
   # ... other routes ...
   post '/login', to: 'tokens#login'
+  delete '/logout', to: 'base#logout_user'
 end

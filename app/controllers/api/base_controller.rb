@@ -47,6 +47,25 @@ module Api
       render json: { message: I18n.t('common.errors.record_not_uniq_error') }, status: :forbidden
     end
 
+    def logout_user(session_token)
+      if session_token.blank?
+        render json: { message: 'Session token is missing.' }, status: :unprocessable_entity
+        return
+      end
+
+      user = User.find_by(session_token: session_token)
+      if user
+        user.update(session_token: nil, session_expiry: Time.current)
+        render json: { message: 'Successfully logged out' }, status: :ok
+      else
+        render json: { message: 'Invalid session token or user not found.' }, status: :not_found
+      end
+    rescue StandardError => e
+      render json: error_response(nil, e), status: :internal_server_error
+    end
+
+    private :logout_user
+
     def create_session_token(user, keep_session)
       session_token = SecureRandom.hex(10)
       session_expiry = keep_session ? 90.days.from_now : 24.hours.from_now
