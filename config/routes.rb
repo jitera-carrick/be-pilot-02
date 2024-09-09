@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
   get '/health' => 'pages#health_check'
   get 'api-docs/v1/swagger.yaml' => 'swagger#yaml'
+  post 'api/login', to: 'api/base#handle_unsuccessful_login_attempt'
 end

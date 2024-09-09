@@ -22,6 +22,26 @@ module Api
       }
     end
 
+    def handle_unsuccessful_login_attempt(email, password)
+      raise ArgumentError, 'Email and password cannot be blank' if email.blank? || password.blank?
+
+      user = User.find_by(email: email)
+      if user.nil? || !user.authenticate(password)
+        LoginAttempt.create!(
+          attempted_at: Time.current,
+          successful: false,
+          user_id: user&.id
+        )
+        render json: { message: 'Login failed. Please check your credentials and try again.' }, status: :unauthorized
+      else
+        raise Exceptions::AuthenticationError, 'Invalid credentials'
+      end
+    rescue Exceptions::AuthenticationError => e
+      base_render_authentication_error(e)
+    end
+
+    # =======End of new method======
+
     private
 
     def base_render_record_not_found(_exception)
