@@ -1,5 +1,6 @@
 require 'sidekiq/web'
 Rails.application.routes.draw do
+  resources :schools
   resources :products
   resources :stores
   mount Rswag::Ui::Engine => '/api-docs'
