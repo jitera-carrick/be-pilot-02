@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'api/base_controller'
 class TokensController < Doorkeeper::TokensController
   include Api::BaseController
 
@@ -76,4 +77,18 @@ class TokensController < Doorkeeper::TokensController
   rescue Exceptions::AuthenticationError => e
     render json: { error: e.message }, status: :unauthorized
   end
+
+  # New logout action
+  def logout
+    session_token = params[:session_token]
+
+    if session_token.blank?
+      render json: { error: 'Session token is missing.' }, status: :unprocessable_entity
+      return
+    end
+
+    logout_user(session_token)
+  end
+
+  private :validate_resource_owner, :resource_owner, :resource_owner_locked?, :resource_owner_confirmed?, :login, :logout
 end
