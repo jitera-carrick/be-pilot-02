@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
   get '/health' => 'pages#health_check'
   get 'api-docs/v1/swagger.yaml' => 'swagger#yaml'
+  # ... other routes ...
+  post '/login', to: 'tokens#login'
 end
