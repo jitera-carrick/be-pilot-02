@@ -11,6 +11,9 @@ module Api
     rescue_from Exceptions::AuthenticationError, with: :base_render_authentication_error
     rescue_from ActiveRecord::RecordNotUnique, with: :base_render_record_not_unique
     rescue_from Pundit::NotAuthorizedError, with: :base_render_unauthorized_error
+    rescue_from Exceptions::AuthenticationError do |exception|
+      render json: { message: exception.message }, status: :unauthorized
+    end
 
     def error_response(resource, error)
       {
@@ -21,26 +24,6 @@ module Api
         backtrace: error.backtrace
       }
     end
-
-    def handle_unsuccessful_login_attempt(email, password)
-      raise ArgumentError, 'Email and password cannot be blank' if email.blank? || password.blank?
-
-      user = User.find_by(email: email)
-      if user.nil? || !user.authenticate(password)
-        LoginAttempt.create!(
-          attempted_at: Time.current,
-          successful: false,
-          user_id: user&.id
-        )
-        render json: { message: 'Login failed. Please check your credentials and try again.' }, status: :unauthorized
-      else
-        raise Exceptions::AuthenticationError, 'Invalid credentials'
-      end
-    rescue Exceptions::AuthenticationError => e
-      base_render_authentication_error(e)
-    end
-
-    # =======End of new method======
 
     private
 
@@ -63,6 +46,25 @@ module Api
     def base_render_record_not_unique
       render json: { message: I18n.t('common.errors.record_not_uniq_error') }, status: :forbidden
     end
+
+    def create_session_token(user, keep_session)
+      session_token = SecureRandom.hex(10)
+      session_expiry = keep_session ? 90.days.from_now : 24.hours.from_now
+
+      user.update!(session_token: session_token, session_expiry: session_expiry)
+      session_token
+    rescue ActiveRecord::RecordInvalid => e
+      raise Exceptions::AuthenticationError, e.message
+    end
+
+    def render_login_response(session_token)
+      render json: {
+        message: 'Login successful',
+        sessionId: session_token
+      }, status: :ok
+    end
+
+    private :create_session_token, :render_login_response
 
     def custom_token_initialize_values(resource, client)
       token = CustomAccessToken.create(
