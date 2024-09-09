@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Kais</h1>
+
+<div id="kais">
+  <% @kais.each do |kai| %>
+    <%= render kai %>
+    <p>
+      <%= link_to "Show this kai", kai %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New kai", new_kai_path %>

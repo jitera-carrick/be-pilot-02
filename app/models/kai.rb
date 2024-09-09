@@ -1,0 +1,2 @@
+class Kai < ApplicationRecord
+end

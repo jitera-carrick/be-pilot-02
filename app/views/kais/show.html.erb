@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @kai %>
+
+<div>
+  <%= link_to "Edit this kai", edit_kai_path(@kai) %> |
+  <%= link_to "Back to kais", kais_path %>
+
+  <%= button_to "Destroy this kai", @kai, method: :delete %>
+</div>
