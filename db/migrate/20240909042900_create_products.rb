@@ -1,9 +1,9 @@
-class CreateProducts < ActiveRecord::Migration[7.0]
+class CreateProducts < ActiveRecord::Migration[6.0]
   def change
     create_table :products do |t|
-      t.string :name
-      t.string :description
-      t.decimal :price
+      t.string :name, null: false
+      t.text :description
+      t.decimal :price, precision: 10, scale: 2, null: false
 
       t.timestamps
     end
